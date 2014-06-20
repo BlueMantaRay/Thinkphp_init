@@ -1,0 +1,50 @@
+/**
+ * 顶部导航和侧边
+ */
+#my_container {
+    margin-top: 30px;
+    padding: 0 15px;
+}
+.my_side_top_nav {
+	padding-left: 3%;
+	padding-right: 3%;
+}
+.my_side_top_nav input {
+	border-color: #222;
+	background: #333;
+}
+.my_side_top_nav button {
+	border-color: #666;
+	background: #999;
+}
+.my_side_nav {
+	margin-top: 40px;
+	margin-bottom: 30px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	text-shadow: 0 1px 0 #fff;
+	background-color: #f7f5fa;
+	border-radius: 5px;
+	width:100%;
+}
+.my_img_box {
+	margin:5px;
+	text-align:center;
+}
+.my_img_list {
+	text-align:center;
+}
+.my_image_del {
+	border-radius: 4px;
+	transition: all 0.2s ease-in-out 0s;
+    background: none repeat scroll 0 0 #FF0000;
+    cursor: pointer;
+    float: right;
+    height: 20px;
+    padding-left: 0px;
+    position: absolute;
+    right: 0px;
+    top: 8px;
+    width: 20px;
+}
+

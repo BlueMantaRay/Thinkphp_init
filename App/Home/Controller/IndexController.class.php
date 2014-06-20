@@ -1,17 +1,19 @@
 <?php
-/* ThinkPHP的命名空间使用规范。注意：命名空间定义必须写在所有的PHP代码之前声明，否则会出错
+/**
+ * ThinkPHP的命名空间使用规范。注意：命名空间定义必须写在所有的PHP代码之前声明，否则会出错
  * 命名空间和实际的控制器文件所在的路径是一致的，
  * 也就是说： Home\Controller\IndexController类
  * 对应的控制器文件位于应用目录下面的 Home/Controller/IndexController.class.php，
  * 如果你改变了当前的模块名，那么这个控制器类的命名空间也需要随之修改。
  */
 namespace Home\Controller;
-/*
- * 引入 Think\Controller 命名空间便于直接使用
- * 等同于使用：class IndexController extends \Think\Controller
+/**
+ * 引入 Common\Lib\AppController 命名空间便于直接使用
+ * 等同于使用：class 类名 Common\Lib\AppController
+ * (这里没有使用Thinkphp例子中写的Controller控制器，AppController是继承Controller的，这样你就可以在app中添加整个项目都会用到的方法了)
  */
-use Common\Lib\CommonController;
-class IndexController extends CommonController {
+use Common\Lib\AppController;
+class IndexController extends AppController {
     public function index(){
 		echo 'home';
 
