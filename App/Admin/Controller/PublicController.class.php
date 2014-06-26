@@ -22,15 +22,65 @@ class PublicController extends AppController {
     }
 
     public function check_login() {
+		$adminname = I('adminname', '');
+		$password = I('password', '');
+		$verify_code = I('verify', '');
+		if (empty($verify_code)) {
+			$this->out('error', '请填写验证码');
+		}
+		if (empty($adminname)) {
+			$this->out('error', '请填写用户名');
+		}
+		if (empty($password)) {
+			$this->out('error', '请填写密码');
+		}
+		// array('verify_code'=>'当前验证码的值','verify_time'=>'验证码生成的时间戳')
+		$verify = new \Think\Verify();
+		if (!$verify->check($verify_code)) {
+			$this->out('fail', '验证码不正确或已过期，请重试');
+		}
 
-    	$this->out('ok', 'gd gdagea');
+		$model = D('Admin');
+		$where['adminname'] = $adminname;
+		$info = $model->where($where)->find();
+		if (empty($info)) {
+			$this->out('error', '用户名不存在');
+		} else {
+			if ($info['password'] != md5($password)) {
+				$this->out('error', '密码不正确');
+			} else {
+				if ($info['status'] != 1) {
+					$this->out('error', '用户被禁止');
+				}
+			}
+		}
+
+		session('adminname', $info['adminname']);
+		session('admin_id', $info['id']);
+		session('admin_info', $info);
+
+		$model->where($info['id'])->save(array('login_time' => time()));
+
+    	$this->out('ok', 'Success !');
     }
 
+    public function logout(){
+		unset($_SESSION['admin_id']);
+		unset($_SESSION['adminname']);
+		unset($_SESSION['admin_info']);
+
+		$this->out('ok', '退出成功', 'login');
+    }
     /**
      * 生成验证码
      */
     public function verify() {
-    	$Verify = new \Think\Verify();
-    	$Verify->entry();
+
+    	$verify = new \Think\Verify();
+    	$verify->entry();
+    }
+
+    public function show_menu(){
+
     }
 }

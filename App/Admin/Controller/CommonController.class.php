@@ -10,79 +10,118 @@ namespace Admin\Controller;
  * (这里没有使用Thinkphp例子中写的Controller控制器，AppController是继承Controller的，这样你就可以在app中添加整个项目都会用到的方法了)
  */
 use Common\Lib\AppController;
-use Org\Util\Rbac;
+use Common\ORG\Menu;
 class CommonController extends AppController {
+	protected $page_num = 10;
 
 	public function _initialize() {
-		/*
-		// 用户权限检查
-        if (C('USER_AUTH_ON') && !in_array(MODULE_NAME, explode(',', C('NOT_AUTH_MODULE')))) {
-            //import('@.ORG.Util.RBAC');	// 3.2以前的写法
-            if (!Rbac::AccessDecision()) {
-                //检查认证识别号
-                if (!$_SESSION [C('USER_AUTH_KEY')]) {
-                    //跳转到认证网关
-                    redirect(PHP_FILE . C('USER_AUTH_GATEWAY'));
-                }
-                // 没有权限 抛出错误
-                if (C('RBAC_ERROR_PAGE')) {
-                    // 定义权限错误页面
-                    redirect(C('RBAC_ERROR_PAGE'));
-                } else {
-                    if (C('GUEST_AUTH_ON')) {
-                        $this->assign('jumpUrl', PHP_FILE . C('USER_AUTH_GATEWAY'));
-                    }
-                    // 提示错误信息
-                    $this->error(L('_VALID_ACCESS_'));
-                }
-            }
-        }
-		*/
-	}
 
-	public function upload_img(){
-		$config['exts'] = array('jpg', 'gif', 'png', 'jpeg');
+		if (empty($_SESSION[C('MENU_USER_AUTH_KEY')])) {
+			// 没有登录
+			$this->redirect(C('MENU_USER_AUTH_GATEWAY'));
+		}
+		// 当前的操作
+		$where['module_name'] = MODULE_NAME;
+		$where['controller_name'] = CONTROLLER_NAME;
+		$where['action_name'] = ACTION_NAME;
+		$where['param'] = I('param', '');
+		$active_info = D(C('MENU_TABLE_NODE'))->where($where)->find();
 
-		$this->_upload_one($_FILES['image_up'] ,$config);
-
-	}
-
-	public function _upload_one($files, $config = array()){
-		$default_config = array(
-				'maxSize'    =>    3145728,
-				'rootPath'	 =>    './Public/',
-				'savePath'   =>    './upload/',
-				'saveName'   =>    array('uniqid',''),
-				'autoSub'    =>    true,
-				'subName'    =>    array('date','Ymd')
-		);
-		// 如果传入配置会覆盖上面的
-		if ($config && is_array($config)) {
-			$config = array_merge($config, $default_config);
+		if (empty($active_info)) {
+			// 自动添加节点，正式运行后要注释掉
+			$this->auto_add_node();
+			$this->out('error', '对不起，未找到对应的操作', __MODULE__.'/Index/index');
 		} else {
-			$config = $default_config;
+			// 如果有需要对标题替换的
+			if ($active_info['replace']) {
+				$replace_arr = explode(';', $active_info['replace']);
+				if ($replace_arr) {
+					$find = $replace_arr[0];
+					$replace = $replace_arr[1];
+					$active_info['title'] = str_ireplace($find, $replace, $active_info['title']);
+				}
+			}
+		}
+		// 获取菜单并分配到页面
+		$_ajax = I('is_ajax', '');
+		if ( !IS_AJAX  || $_ajax ) {
+			$admin_menu_list = Menu::get_menu_list($active_info);
+			$this->assign('admin_menu_list', $admin_menu_list);
+			$this->assign('active_info', $active_info);
+		}
+		// 开启了验证
+		if (C('MENU_USER_AUTH_ON')) {
+			// 并且当前操作不在，无需认证模块，无需认证的控制器 中
+			if (!in_array(MODULE_NAME, explode(',', C('MENU_NOT_AUTH_MODULE'))) && !in_array(CONTROLLER_NAME, explode(',', C('MENU_NOT_AUTH_CONTROLLER')))) {
+				// 用户权限检查
+				if (!Menu::auth($active_info)) {
+					$this->out('ok', '对不起，您没有该操作的权限', __MODULE__.'/Index/index');
+				}
+			}
 		}
 
-		$upload = new \Think\Upload($config);
 
-		// 上传文件
-		$info   =   $upload->uploadOne($files);
 
-		if(!$info) {
-			// 上传错误提示错误信息
-			$this->out('error', $upload->getError());
-		}else{
-			$model = D("resource"); // 实例化User对象
-			unset($info['key']);
-			unset($info['md5']);
-			unset($info['sha1']);
-			$id = $model->data($info)->add();
-			$info['id'] = $id;
-			$info['path'] = __ROOT__.'/Public'.ltrim($info['savepath'], '.').$info['savename'];
-			// 上传成功
-			$this->out('ok', $info);
-		}
 	}
+
+	/**
+	 * 自动添加节点，正式运行后要注释掉
+	 */
+	protected function auto_add_node(){
+		/*
+		MODULE_NAME 当前模块名
+		CONTROLLER_NAME 当前控制器名
+		ACTION_NAME 当前操作名
+		*/
+		$module_name = MODULE_NAME;
+		$controller_name = CONTROLLER_NAME;
+		$action_name = ACTION_NAME;
+		$model = D('Menu');
+		$where['module_name'] = $module_name;
+		$where['controller_name'] = $controller_name;
+		$where['level'] = 2;
+		$p_info = $model->where($where)->find();
+		if (empty($p_info)) {
+			$wh['module_name'] = $module_name;
+			$wh['level'] = 1;
+			$wh['pid'] = 0;
+			$top_info = $model->where()->find();
+			$where['title'] = $action_name;
+			$where['pid'] = $top_info['id'];
+			$where['path'] = $top_info['path'].'-'.$top_info['id'];
+			$where['level'] = 2;
+			$where['is_show'] = 0;
+			$where['status'] = 1;
+			$where['add_time'] = time();
+
+			$p_id = $model->data($where)->add();
+			$path = $where['path'].'-'.$p_id;
+		} else {
+			$p_id = $p_info['id'];
+			$path = $p_info['path'].'-'.$p_info['id'];
+		}
+		$data['module_name'] = $module_name;
+		$data['controller_name'] = $controller_name;
+		$data['action_name'] = $action_name;
+		$data['title'] = $action_name;
+		$data['pid'] = $p_id;
+		$data['path'] = $path;
+		$data['level'] = 3;
+		$data['is_show'] = 0;
+		$data['status'] = 1;
+		$data['add_time'] = time();
+		$result = $model->data($data)->add();
+	}
+
+
+
+	public function add_log($a, $b, $data){
+
+	}
+
+
+
+
 
 
 }

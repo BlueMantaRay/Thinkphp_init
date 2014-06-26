@@ -281,6 +281,7 @@ abstract class Controller {
             // 默认操作成功自动返回操作前页面
             if(!isset($this->jumpUrl)) $this->assign("jumpUrl",$_SERVER["HTTP_REFERER"]);
             $this->display(C('TMPL_ACTION_SUCCESS'));
+            exit;
         }else{
             $this->assign('error',$message);// 提示信息
             //发生错误时候默认停留3秒

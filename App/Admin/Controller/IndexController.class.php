@@ -9,9 +9,6 @@ use Admin\Controller\CommonController;
 class IndexController extends CommonController {
     public function index(){
 
-    	$model = M('admin');
-    	p($model);
-    	exit;
 
     	//$this->out('error', 'aaaaaaaaaaaaaaa');
 		$this->display();

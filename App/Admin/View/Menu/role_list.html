@@ -1,0 +1,73 @@
+<include file="Public/side" />
+
+<div class="col-xs-9" role="main">
+	<form action='__URL__/role_list' id="js_search" method="get">
+		<ol class="breadcrumb">
+			<li class="active">
+				<table>
+					<tr>
+						<td>
+							<a href="__URL__/role_list/status/0"><span class="label <if condition='$status eq 0'>label-default<else/>label-info</if>">全部</span></a> 
+							<a href="__URL__/role_list/status/1"><span class="label <if condition='$status eq 1'>label-default<else/>label-success</if>">正常</span></a>
+							<a href="__URL__/role_list/status/2"><span class="label <if condition='$status eq 2'>label-default<else/>label-warning</if>">回收站</span></a>
+						</td>
+						<td>
+							<input type="text" class="form-control" name="keyword" value="{$keyword}" placeholder="角色名" style="float: left;">
+						</td>
+
+						<td><button type="submit" class="btn btn-sm btn-primary">搜索</button></td>
+						<td colspan="2">
+							<span class="nav-addbtn">
+								<a href="__URL__/role_add" class="btn btn-sm btn-success" style="float:right;">添加</a>
+							</span>
+						</td>
+					</tr>
+				</table>
+			</li>
+		</ol>
+	</form>
+	<div class="table-responsive">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>名称</th>
+					<th>上级ID</th>
+					<th>介绍</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<volist name="list" id="val">
+					<tr>
+						<td>{$val.id}</td>
+						<td>{$val.name}</td>
+						<td>{$val.pid}</td>
+						<td>{$val.remark}</td>
+						<td>
+							<a href="__URL__/role_add/id/{$val.id}" class="btn btn-primary btn-xs">编辑</a>
+							<if condition="$val.status eq 1">
+								<a href="__URL__/role_delete/id/{$val.id}" class="btn btn btn-warning btn-xs delete_one">删除</a>
+							<else />
+								<a href="__URL__/role_reduction/id/{$val.id}" class="btn btn-success btn-xs reduction">还原</a>
+								<a href="__URL__/role_delete_really/id/{$val.id}" class="btn btn-danger btn-xs delete_really">彻底删除</a>
+							</if>
+						</td>
+					</tr>
+				
+				</volist>
+			</tbody>
+		</table>
+		
+		<div class="my_page">
+			{$page}
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+//var $status = '{$status}';
+</script>
+
+
+<include file="Public/footer" />

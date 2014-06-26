@@ -1,4 +1,4 @@
-<include file="Public/header" title="[title]" />
+<include file="Public/header" title="{$active_info.title}{$page_title}" />
 
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse my_side_top_nav" role="navigation">
 	<!-- Brand and toggle get grouped for better mobile display -->
@@ -8,12 +8,22 @@
 			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
 			<span class="icon-bar"></span> <span class="icon-bar"></span>
 		</button>
-		<a class="navbar-brand" href="#">Brand</a>
+		<a class="navbar-brand" href="__MODULE__/Index/index">管理中心</a>
 	</div>
 
 	<!-- Collect the nav links, forms, and other content for toggling -->
 	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		<ul class="nav navbar-nav">
+			<volist name="admin_menu_list" id="menu">
+				<if condition="$menu['is_active'] eq 1">
+				<li class="active">
+				<else/>
+				<li>
+				</if>
+					<a href="javascript:void(0);" class="js_top_menu" data-id="{$menu.id}">{$menu.title}</a>
+				</li>
+			</volist>
+			<!-- 
 			<li class="active"><a href="#">设置</a></li>
 			<li><a href="#">微信</a></li>
 			<li class="dropdown">
@@ -28,26 +38,27 @@
 					<li><a href="#">One more separated link</a></li>
 				</ul>
 			</li>
+			 -->
 		</ul>
-		<form action="#" method="get" class="navbar-form navbar-left" role="search">
-		    <div class="input-group">
-		      <input type="text" name="nav_serach" class="form-control" placeholder="Serach" >
-		      <span class="input-group-btn">
-		        <button class="btn btn-default" type="button">Go!</button>
-		      </span>
-		    </div><!-- /input-group -->
-		</form>
+		<div class="col-xs-3">
+			<form action="#" method="get" class="navbar-form navbar-left" role="search">
+				<div class="input-group">
+					<input type="text" name="nav_serach" class="form-control" placeholder="Serach"> 
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="button">Go!</button>
+					</span>
+				</div>
+			</form>
+		</div>
+
 		<ul class="nav navbar-nav navbar-right">
-			<li><a href="#">Link</a></li>
+			<li><a href="__ROOT__" target="_blank">网站首页</a></li>
 			<li class="dropdown"><a href="#" class="dropdown-toggle"
-				data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+				data-toggle="dropdown">{$Think.session.adminname} <b class="caret"></b></a>
 				<ul class="dropdown-menu">
-					<li><a href="#">Action</a></li>
-					<li><a href="#">Another action</a></li>
-					<li><a href="#">Something else here</a></li>
-					<li class="divider"></li>
-					<li><a href="#">Separated link</a></li>
-				</ul></li>
+					<li><a href="__MODULE__/Public/logout">退出登陆</a></li>
+				</ul>
+			</li>
 		</ul>
 	</div>
 	<!-- /.navbar-collapse -->
@@ -59,38 +70,47 @@
 	<div class="row">
 		<div class="col-xs-3">
 			<div class="" role="complementary">
-				<ul class="nav my_side_nav">
-                <li class="">
-				  <a href="#nav_1" data-toggle="collapse">权限管理</a>
-				  <ul id="nav_1" class="nav collapse">
-				    <li><a href="#overview-doctype">HTML5文档类型</a></li>
-				    <li><a href="#overview-mobile">移动设备优先</a></li>
-				    <li><a href="#overview-responsive-images">响应式图片</a></li>
-				    <li><a href="#overview-type-links">排版和链接</a></li>
-				    <li><a href="#overview-normalize">Normalize</a></li>
-				    <li><a href="#overview-container">Containers</a></li>
-				  </ul>
-				</li>
-                <li>
-				  <a href="#nav_2" data-toggle="collapse">管理员管理</a>
-				  <ul id="nav_2" class="nav collapse">
-				    <li><a href="__MODULE__/Admin/index">管理员列表</a></li>
-				    <li><a href="__MODULE__/Admin/admin_add">管理员添加</a></li>
-				    <li><a href="#overview-responsive-images">用户</a></li>
-				    <li><a href="#overview-type-links">用户</a></li>
-				    <li><a href="#overview-normalize">Nor用户</a></li>
-				    <li><a href="#overview-container">Cont用户</a></li>
-				  </ul>
-				</li>
-
-				</ul>
+				<volist name="admin_menu_list" id="menu">
+					<if condition="$menu['is_active'] eq 1">
+						<ul class="nav my_side_nav show" id="js_side_nav_{$menu.id}">
+					<else/>
+						<ul class="nav my_side_nav hidden" id="js_side_nav_{$menu.id}">
+					</if>
+					<volist name="menu['child']" id="m">
+						<if condition="$m['child'] neq null">
+							<li><a href="#nav_{$m.id}" data-toggle="collapse"><if condition="$m.icon neq ''"><span class="my_menu_icon glyphicon {$m.icon}" ></span>&nbsp;&nbsp;</if>{$m.title}</a></li>
+							
+							<if condition="$m['is_active'] eq 1">
+							<ul id="nav_{$m.id}" class="nav in" style="height:auto">
+							<else/>
+							<ul id="nav_{$m.id}" class="nav collapse">
+							</if>
+							
+								<volist name="m['child']" id="n">
+									<if condition="$n['is_active'] eq 1">
+									<li class="li_active">
+									<else/>
+									<li>
+									</if>
+										<a href="__ROOT__/{$n.module_name}/{$n.controller_name}/{$n.action_name}<if condition='$n[param] neq null'>/param/{$n.param}</if>">{$n.title}</a>
+									</li>
+								</volist>
+								
+							</ul>
+						<else/>
+							<li><a href="__ROOT__/{$m.module_name}/{$m.controller_name}/{$m.action_name}<if condition='$m[param] neq null'>/param/{$m.param}</if>">{$m.title}</a></li>
+						</if>
+					</volist>
+					</ul>
+				</volist>
+				
 			</div>
 		</div>
 		
 		<div class="col-xs-9" role="main">
 			<div class="bs-docs-section">
 				<div class="page-header">
-					<h1 id="overview">[title]</h1>
+					<h1 id="overview">{$active_info.title}</h1>
 				</div>
 			</div>
 		</div>
@@ -102,13 +122,29 @@
 
 
 <script type="text/javascript">
+
 $('.affix').affix({
-    offset: {
-      top: 100
-    , bottom: function () {
-        return (this.bottom = $('.bs-footer').outerHeight(true))
-      }
-    }
-  })
+	offset : {
+		top : 100,
+		bottom : function() {
+			return (this.bottom = $('.bs-footer').outerHeight(true))
+		}
+	}
+})
+
+$(".js_top_menu").click(function(){
+	var obj = $(this);
+	var menu_id = obj.attr('data-id');
+	console.log(menu_id);
+	console.log($("#js_side_nav_"+menu_id));
+	
+	obj.closest('ul').find('li').removeClass('active');
+	obj.closest('li').addClass('active');
+	
+	console.log($("#js_side_nav_"+menu_id).siblings('ul'));
+	$(".my_side_nav").removeClass('show').addClass('hidden');
+	$("#js_side_nav_"+menu_id).removeClass('hidden').addClass('show');
+	return false;
+});
 
 </script>

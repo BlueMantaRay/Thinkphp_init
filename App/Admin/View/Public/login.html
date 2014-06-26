@@ -77,6 +77,10 @@ $(".form-signin").submit(function(e){
 		if (json.info == 'ok') {
 			lump_ok(json.data);
 			window.location.href = "__MODULE__/Index/index";
+		} else if (json.info == 'fail') {
+			lump_error(json.data);
+			$("#js_verify").trigger('click');
+			return false;	
 		} else {
 			lump_error(json.data);
 			return false;	

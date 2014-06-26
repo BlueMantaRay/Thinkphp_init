@@ -1,0 +1,189 @@
+<include file="Public/side" />
+
+<div class="col-xs-9" role="main">
+
+	<form id="js_form" action="__URL__/role_save" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+	
+
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">角色名</label>
+			<div class="col-xs-4">
+				<input type="text" name="name" value="{$info.name}" class="form-control" placeholder="角色名" autocomplete="off" required="required" >
+			</div>
+		</div>
+
+
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">介绍</label>
+			<div class="col-xs-4">
+				<input type="tel" name="remark" value="{$info.remark}" class="form-control" placeholder="如果不填,将用标题作为介绍">
+			</div>
+		</div>
+		
+
+		<div class="form-group">
+			<label class="col-sm-2 control-label">角色权限配置</label>
+			<div class="col-xs-4">
+				<div class="checkbox-inline">
+					<label><input type="checkbox" class="check_all" /> 全选</label>
+				</div>
+			</div>
+		</div>
+
+		<volist name="menu_list" id="val">
+		<div class="js_node">
+			<div class="form-group">
+				<label class="col-sm-2 control-label"> 
+					{$val.title} 
+					<input type="checkbox" name="menu_id[]" value="{$val.id}" class="js_menu_checked" autocomplete="off" <if condition="$val['is_selected']">checked</if> />
+				</label>
+				<div class="col-xs-4"></div>
+			</div>
+			<volist name="val['child']" id="v">
+			<div class="form-group">
+				<label class="col-sm-2 control-label"></label>
+				<div class="col-xs-7">
+					<label style="display: block;">
+						<input type="checkbox" name="menu_id[]" value="{$v.id}" class="js_line_checked" autocomplete="off" <if condition="$v['is_selected']">checked</if> /> 
+						
+						<if condition="$v['is_show'] eq 1">
+							{$v.title}
+						<else/>
+							<span class="f_gray"> {$v.title}</span>
+						</if>
+					</label> 
+					<span> 
+						<volist name="v['child']" id="n">
+							<label style="font-weight:normal;">
+								<input type="checkbox" name="menu_id[]" value="{$n.id}" class="checkeds" autocomplete="off" <if condition="$n['is_selected']">checked</if> /> 
+								<if condition="$n['is_show'] eq 1">
+									{$n.title} &nbsp;&nbsp;&nbsp;
+								<else/>
+									<span class="f_gray">{$n.title} &nbsp;&nbsp;&nbsp;</span>
+								</if>
+								
+							</label>
+						</volist>
+					</span>
+				</div>
+			</div>
+			</volist> 
+		</div>
+		</volist>
+
+
+
+
+
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">是否启用</label>
+			<div class="col-xs-4">
+				<label class="checkbox-inline">
+					<input type="radio" name="status" value="1" <if condition="!$info or $info.status eq 1">checked="checked"</if> > 启用
+				</label> 
+				<label class="checkbox-inline">
+					<input type="radio" name="status" value="2" <if condition="$info.status eq 2">checked="checked"</if> > 禁用
+				</label>
+			</div>
+		</div>
+
+		<div class="form-group">
+			<div class="col-sm-offset-2 col-sm-10">
+				<input type="hidden" name="id" value="{$info.id}" />
+				<button type="submit" class="btn btn-default">保 存</button>
+				<a href="javascript:window.history.back();" class="btn btn-link">返回</a>
+			</div>
+		</div>
+	</form>
+
+
+</div>
+
+
+<script type="text/javascript">
+var id = '{$info.id}';
+
+// 表单提交
+$("#js_form").submit(function(){
+	var obj = $(this);
+	var url = obj.attr('action');
+	var type = obj.attr('method');
+	var data = obj.serialize();
+	$.ajax({
+		   url: url,
+		   type: type,
+		   data: data,
+		   dataType: 'json',
+		   success: function(json){
+			   if (json.info == 'ok') {
+					   js_prompt(json.data, function(){
+						   if (id) {
+							   window.location = document.referrer;
+						   } else {
+							   window.location.reload();
+						   }
+					   });
+			   } else {
+			   	js_prompt(json.data);
+			   }
+		   }
+	});
+	
+	return false;
+});
+
+
+// 全选
+$(".check_all").click(function(){
+    if ($(this).prop("checked") == true || $(this).prop("checked") == "checked") {
+	      $("input[name='menu_id[]']").prop("checked", true);
+	} else {
+		$("input[name='menu_id[]']").prop("checked", false);
+	}
+});
+// 当有未选中的取消全选的选中，当没有未选中时选中全选
+$("body").on('click',"input[name='menu_id[]']", function(){
+	var flag = false;
+	var sign = false;
+	$("input[name='menu_id[]']").each(function(){
+		if (!$(this).prop('checked')) {
+			flag = true;
+			sign = true;
+		}
+	});
+	if (flag) {
+		$(".check_all").removeAttr("checked");
+	}
+	if (!sign) {
+		$(".check_all").prop("checked", true);
+	}
+});
+
+$(".checkeds").click(function(){
+    $(this).closest(".controls").find(".oneChecked").prop("checked", true);
+    if ($(this).closest(".controls").find(".checkeds:checked").length < 1) {
+      $(this).closest(".controls").find(".oneChecked").prop("checked", false);
+    }
+});
+// 选择某一菜单下的所有
+$(".js_menu_checked").click(function(){
+    if ($(this).prop("checked") == true || $(this).prop("checked") == "checked") {
+      $(this).closest(".js_node").find("input").prop("checked", true);
+    } else {
+      $(this).closest(".js_node").find("input").prop("checked", false);
+    }
+})
+
+// 一选，选择一行
+$(".js_line_checked").click(function(){
+    if ($(this).prop("checked") == true || $(this).prop("checked") == "checked") {
+      $(this).closest(".form-group").find(".checkeds").prop("checked", true);
+    } else {
+      $(this).closest(".form-group").find(".checkeds").prop("checked", false);
+    }
+})
+
+
+</script>
+
+<include file="Public/footer" />

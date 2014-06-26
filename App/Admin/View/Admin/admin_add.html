@@ -1,49 +1,115 @@
-<include file="Public/side" title="管理员列表" />
+<include file="Public/side" />
 
 <div class="col-xs-9" role="main">
 
-	<form action="__URL__/save" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
+	<form id="js_form" action="__URL__/save" method="post" enctype="multipart/form-data" class="form-horizontal" role="form">
 		<div class="row" id="my_img_box">
+			<div class="col-xs-2 col-md-2 my_img_list">
+			</div>
+			<div id="js_img_div">
+				<if condition="$info.pic gt 0">
+				<div class="col-xs-2 col-md-2 my_img_list" data-id="{$info.pic}">
+					<div class="thumbnail"> 
+						<img src="{$info.pic|get_img=190,190,'thumb','__PUBLIC__/images/admin/default-avatar.gif'}" title="{$info.pic|get_img_info='name'}">
+						<span class="close my_image_del" title="点击删除图片">&times;</span>
+					</div>
+				</div>
+				</if>
+			</div>
+			<!-- 
 		  <div class="col-xs-2 col-md-2 my_img_list">
-		  </div>
-		  <div class="col-xs-2 col-md-2 my_img_list" id="js_img_div">
 		    <a href="#" class="thumbnail">
 		      <img src="__PUBLIC__/images/admin/default-avatar.gif" alt="...">
 		      <span class="close my_image_del" title="点击删除图片">&times;</span>
 		    </a>
 		  </div>
+		   -->
 		</div>
 		  
 		<div class="form-group ">
         	<label for="input-staff_num" class="col-sm-2 control-label">图片</label>
         	<div class="col-sm-8">
 	        <input type="file" name="image_up"  class="btn" id="image_up" value="" title="<i class='glyphicon glyphicon-folder-open'></i> 上传图片" >
-	        <input type="hidden" name="photo_id" value="">
+	        <input type="hidden" name="pic" value="{$info.pic}">
 	        </div>
       	</div>
 	
 		<div class="form-group">
-			<label for="inputEmail3" class="col-sm-2 control-label">用户名</label>
+			<label for="" class="col-sm-2 control-label">* 用户名</label>
 			<div class="col-xs-4">
-				<input type="text" name="adminname" class="form-control" id="email" placeholder="用户名">
+				<input type="text" name="adminname" value="{$info.adminname}" class="form-control" id="email" placeholder="User" required="required">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="inputPassword3" class="col-sm-2 control-label">Password</label>
+			<label for="" class="col-sm-2 control-label">Password</label>
 			<div class="col-xs-4">
-				<input type="password" name="password" class="form-control" id="password" placeholder="Password">
+				<input type="password" name="password" class="form-control" id="password" placeholder="Password" autocomplete="off">
 			</div>
 		</div>
 		<div class="form-group">
-			<label for="inputPassword3" class="col-sm-2 control-label">确认密码</label>
+			<label for="" class="col-sm-2 control-label">确认密码</label>
 			<div class="col-xs-4">
-				<input type="password" name="re_password" class="form-control" id="re_password" placeholder="Password">
+				<input type="password" name="re_password" class="form-control" id="re_password" placeholder="Re_password" autocomplete="off">
+				<p class="help-block">如果不修改密码，密码请留空</p>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">邮箱</label>
+			<div class="col-xs-4">
+				<input type="email" name="email" value="{$info.email}" class="form-control" id="email" placeholder="Email">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">电话</label>
+			<div class="col-xs-4">
+				<input type="tel" name="tel" value="{$info.tel}" class="form-control" id="tel" placeholder="Telephone">
+			</div>
+		</div>
+
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">性别</label>
+			<div class="col-xs-4">
+				<label class="checkbox-inline">
+					<input type="radio" name="gender" value="0" <if condition="$info.gender elt 0">checked="checked"</if> > 保密
+				</label> 
+				<label class="checkbox-inline">
+					<input type="radio" name="gender" value="1" <if condition="$info.gender eq 1">checked="checked"</if> > 男
+				</label>
+				<label class="checkbox-inline"> 
+					<input type="radio" name="gender" value="2" <if condition="$info.gender eq 2">checked="checked"</if> > 女
+				</label>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">管理员角色</label>
+			<div class="col-xs-4">
+				<volist name="role_list" id="val">
+				<label class="checkbox-inline">
+					<input type="checkbox" name="role_id[]" value="{$val.id}" autocomplete="off" <if condition="$val['is_selected'] eq 1">checked="checked"</if>  autocomplete="off" > {$val.name}
+				</label> 
+				</volist>
+			</div>
+		</div>
+		
+		
+		<div class="form-group">
+			<label for="" class="col-sm-2 control-label">是否启用</label>
+			<div class="col-xs-4">
+				<label class="checkbox-inline">
+					<input type="radio" name="status" value="1" <if condition="!$info or $info.status eq 1">checked="checked"</if> > 启用
+				</label> 
+				<label class="checkbox-inline">
+					<input type="radio" name="status" value="2" <if condition="$info.status eq 2">checked="checked"</if> > 禁用
+				</label>
 			</div>
 		</div>
 
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
+				<input type="hidden" name="id" value="{$info.id}" />
 				<button type="submit" class="btn btn-default">保 存</button>
+				<a href="javascript:window.history.back();" class="btn btn-link">返回</a>				
 			</div>
 		</div>
 	</form>
@@ -55,25 +121,21 @@
 <script type="text/javascript" charset="utf-8"  src="__PUBLIC__/js/admin/ajaxfileupload.js"></script>
 <script type="text/javascript" charset="utf-8"  src="__PUBLIC__/js/admin/bootstrap-filestyle.min.js"></script>
 <script type="text/javascript">
-var a_id = '';
 var domain = "";
+var id = '{$info.id}';
 
 $(function(){
-	
 	// 上传图片样式
 	$('#image_up').bootstrapFileInput();
 	// 上传图片
 	var file_name = '0';
 	$("body").on('change','.file-input-wrapper input[type=file]', function(e){
 		e.preventDefault();
-		var len = $(".my_img_list").length;
-		if (len >= 5) {
-			js_prompt('最多上传5张图片');
+		var len = $("#js_img_div").children().length;
+		if (len >= 1) {
+			js_prompt('你已经上传过了');
 		} else {
-			console.log($(".file-input-name").html());
-			console.log(file_name);
 			if ($(".file-input-name").length < 1 || $(".file-input-name").html() != file_name) {
-				console.log('------------------');
 				ajaxFileUpload('image');
 				file_name = $(".file-input-name").html();
 			}
@@ -82,26 +144,52 @@ $(function(){
 	});
 	
     // 删除图片
-    $(".image_del").on('click','.file-input-name', function(e){
+    $("body").on('click','.my_image_del', function(e){
     	e.preventDefault();
 		var obj = $(this);
-		var p_obj = obj.parents('.js_img_list')
+		var p_obj = obj.parents('.my_img_list')
 		var p_id = p_obj.attr('data-id');
     	var data = new Object();
     	data.p_id = p_id;
-    	data.a_id = a_id;
-    	var url = '__MODULE__/Common/del_img';
+    	var url = '__MODULE__/Resource/photo_del';
     	$.post(url, data, function(json){
     		if (json.info == 'ok') {
     			p_obj.remove();
-    			// 拖动排序
-    			$( "#js_img_list_div" ).sortable();
+    			$("input[name='pic']").attr('value', 0);
     		} else {
     			js_prompt(json.data);
     		}
     	}, 'json');
     });
 	
+    // 表单提交
+    $("#js_form").submit(function(){
+    	var obj = $(this);
+    	var url = obj.attr('action');
+    	var type = obj.attr('method');
+    	var data = obj.serialize();
+    	$.ajax({
+    		   url: url,
+    		   type: type,
+    		   data: data,
+    		   dataType: 'json',
+    		   success: function(json){
+    			   if (json.info == 'ok') {
+   					   js_prompt(json.data, function(){
+   						   if (id) {
+   							   window.location.href = '__URL__/index';
+   						   } else {
+   							   window.location.reload();
+   						   }
+   					   });
+    			   } else {
+    			   	js_prompt(json.data);
+    			   }
+    		   }
+    	});
+    	
+    	return false;
+    });
 	
 });
 
@@ -112,13 +200,14 @@ function ajaxFileUpload(up){
 	}).ajaxComplete(function(){
 		$(this).hide();
 	});
-	var url =  '__MODULE__/Common/upload_img';
+	var url =  '__MODULE__/Resource/upload_img';
 	var my_file = up + '_up';
 	var data = new Object();
-	data.res_id = a_id;
-	data.res_name = 'article_photo';
 	data.my_file = my_file;
 	data.is_ajax = 1;
+	data.width = 190;
+	data.height = 190;
+	data.type = 'thumb';
 	$.ajaxFileUpload({
 		url: url,
 		secureuri:false,
@@ -126,10 +215,10 @@ function ajaxFileUpload(up){
 		dataType: 'json',
 		data: data,
 		success: function (json, status){
-			console.log(json);
 			if (json.info == 'ok') {
-				$("#js_img_div").find('img').attr('src', json.data.path);
-				$("input[name='photo_id']").attr('value', json.data.id);
+				var html = get_img_html(json.data);
+				$("#js_img_div").html(html);
+				$("input[name='pic']").attr('value', json.data.id);
 				$("#image_up").attr('value', json.data.name);
 			} else {
 				js_prompt(json.data);
@@ -145,13 +234,13 @@ function ajaxFileUpload(up){
 }
 
 
-function get_li_html(data){
+function get_img_html(data){
 	var html = '';
-	var url = domain + 'Photo/get_photo?id='+data.id+'&w=190&h=190&t=thumb';
+	var url =  data.thumb_img;
 	html +='  <div class="col-xs-2 col-md-2 my_img_list" data-id="'+data.id+'">';
 	html +='    <div class="thumbnail">';
-	html +='      	<img src="'+url+'" title="'+data.photo_name+'">';
-	html +='	  	<span class="close image_del" title="点击删除图片">&times;</span>';
+	html +='      	<img src="'+url+'" title="'+data.name+'">';
+	html +='	  	<span class="close my_image_del" title="点击删除图片">&times;</span>';
 	html +='    </div>';
 	html +='  </div>';
 

@@ -1,25 +1,25 @@
-<include file="Public/side" title="管理员列表" />
+<include file="Public/side" />
 
 <div class="col-xs-9" role="main">
-	<form action='/article/index/' id="member_search" method="get">
+	<form action='__URL__/index' id="js_search" method="get">
 		<ol class="breadcrumb">
 			<li class="active">
 				<table>
 					<tr>
 						<td>
-							<a href="/article/index/status/0"><span class="label label-info">全部</span></a> 
-							<a href="/article/index/status/1"><span class="label label-success">发布中</span></a>
-							<a href="/article/index/status/2"><span class="label label-warning">回收站</span></a>
+							<a href="__URL__/index/status/0"><span class="label <if condition='$status eq 0'>label-default<else/>label-info</if>">全部</span></a> 
+							<a href="__URL__/index/status/1"><span class="label <if condition='$status eq 1'>label-default<else/>label-success</if>">正常</span></a>
+							<a href="__URL__/index/status/2"><span class="label <if condition='$status eq 2'>label-default<else/>label-warning</if>">回收站</span></a>
 						</td>
 						<td>
-							<input type="text" class="form-control" name="keyword" id="" placeholder="用户名" style="float: left;">
+							<input type="text" class="form-control" name="keyword" value="{$keyword}" placeholder="用户名" style="float: left;">
 						</td>
 
 						<td><button type="submit" class="btn btn-sm btn-primary">搜索</button></td>
 						<td colspan="2">
 							<span class="nav-addbtn">
 							<a href="/article/edit/id/0">
-								<button type="button" class="btn btn-sm btn-success" " style="float: right;">添加管理员</button>
+								<a href="__URL__/admin_add" class="btn btn-sm btn-success" style="float:right;">添加管理员</a>
 							</a>
 							</span>
 						</td>
@@ -33,22 +33,47 @@
 			<thead>
 				<tr>
 					<th>ID</th>
-					<th>标题</th>
-					<th>分类</th>
-					<th>排序</th>
-					<th>浏览量</th>
-					<th>添加人</th>
-					<th>更新时间</th>
-					<th>状态</th>
+					<th>用户名</th>
+					<th>性别</th>
+					<th>邮箱</th>
+					<th>电话</th>
+					<th>最后登录时间</th>
+					<th>操作</th>
 				</tr>
 			</thead>
 			<tbody>
-
+				<volist name="list" id="val">
+					<tr>
+						<td>{$val.id}</td>
+						<td>{$val.adminname}</td>
+						<td>{$val.gender}</td>
+						<td>{$val.email}</td>
+						<td>{$val.tel}</td>
+						<td>{$val.login_time|date='Y-m-d H:i:s', ###}</td>
+						<td>
+							<a href="__URL__/admin_add/id/{$val.id}" class="btn btn-primary btn-xs">编辑</a>
+							<if condition="$val.status eq 1">
+								<a href="__URL__/delete/id/{$val.id}" class="btn btn btn-warning btn-xs delete_one">删除</a>
+							<else />
+								<a href="__URL__/reduction/id/{$val.id}" class="btn btn-success btn-xs reduction">还原</a>
+								<a href="__URL__/delete_really/id/{$val.id}" class="btn btn-danger btn-xs delete_really">彻底删除</a>
+							</if>
+						</td>
+					</tr>
+				
+				</volist>
 			</tbody>
 		</table>
+		
+		<div class="my_page">
+			{$page}
+		</div>
 	</div>
 </div>
 
+<script type="text/javascript">
+//var $status = '{$status}';
+</script>
 
 
 <include file="Public/footer" />

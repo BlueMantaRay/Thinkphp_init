@@ -132,6 +132,93 @@ function to_size($bytes) {       	 	     //自定义一个文件大小单位转�
 }
 
 
+
+
+
+
+/**
+ * 获取各种规格的图片，如果有同种规格的图片直接返回，没有将生成
+ * @param string $img		// 要缩放的图片
+ * @param int $width		// 是要缩放到的宽
+ * @param int $height		// 要缩放到的高
+ * @param string $type		// 缩放类型 thumb是缩放 merge是融图 cut是修剪,fixed是固定大小
+ * @param string $default	// 如果图片为空时的默认图片
+ * @return string $newName 	// 缩放后的文件名
+ */
+function get_img($id, $width = 100, $height = 100, $type = 'thumb', $default = ''){
+	$info = get_img_info($id);
+	if (empty($info)) {
+		return $default;
+	}
+	$img_path = 'Public'.ltrim($info['savepath'], '.').$info['savename'];
+	if (!file_exists($img_path)) {
+		return $default;
+	}
+	$type = strtolower($type);
+	$type_arr = array('thumb', 'merge', 'cut', 'fixed');
+	if (!in_array($type, $type_arr)) {
+		$type = 'thumb';
+	}
+	if (empty($width)) {
+		$width = 100;
+	}
+	if (empty($height)) {
+		$height = 100;
+	}
+	$dirname = dirname($img_path);
+	$filename = array_shift(explode('.', $info['savename']));
+	$name = $filename.'_'.$type.'_'.$width.$height.'.'.$info['ext'];
+	$save = $dirname.'/'.$name;
+	if (file_exists($save)) {
+		return __ROOT__.'/'.$save;
+	}
+	$image = new \Think\Image();
+	$image->open($img_path);
+	switch ($type) {
+		case 'merge':
+			// 生成一个缩放后填充的缩略图并保存
+			$image->thumb($width, $height,\Think\Image::IMAGE_THUMB_FILLED)->save($save);
+			break;
+		case 'cut':
+			// 生成一个缩放后填充的缩略图并保存
+			$image->thumb($width, $height,\Think\Image::IMAGE_THUMB_CENTER)->save($save);
+			break;
+		case 'fixed':
+			// 生成一个缩放后填充的缩略图并保存
+			$image->thumb($width, $height,\Think\Image::IMAGE_THUMB_FIXED)->save($save);
+			break;
+		default:
+			// 单纯的缩放
+			$image->thumb($width, $height)->save($save);
+			break;
+	}
+	return __ROOT__.'/'.$save;
+}
+
+
+
+/**
+ * 获取图片信息
+ * @param int $id
+ * @return array
+ */
+function get_img_info($id, $key = ''){
+	if (empty($id)) {
+		return false;
+	}
+
+	$model = D("resource"); // 实例化对象,实例化的是App/Common/Model下的model
+	$info = $model->find($id);
+	if ($key && !empty($info[$key])) {
+		return $info[$key];
+	} else {
+		return $info;
+	}
+}
+
+
+
+
 /**
  * 加密，解密函数
  * 从dzx1 中 copy
