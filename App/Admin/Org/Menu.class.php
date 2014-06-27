@@ -4,8 +4,7 @@
  * @author user
  *
  */
-namespace Common\ORG;
-use Think\Db;
+namespace Admin\ORG;
 
 /**
  +------------------------------------------------------------------------------

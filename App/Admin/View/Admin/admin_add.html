@@ -151,7 +151,7 @@ $(function(){
 		var p_id = p_obj.attr('data-id');
     	var data = new Object();
     	data.p_id = p_id;
-    	var url = '__MODULE__/Resource/photo_del';
+    	var url = '__MODULE__/Public/photo_del';
     	$.post(url, data, function(json){
     		if (json.info == 'ok') {
     			p_obj.remove();
@@ -200,7 +200,7 @@ function ajaxFileUpload(up){
 	}).ajaxComplete(function(){
 		$(this).hide();
 	});
-	var url =  '__MODULE__/Resource/upload_img';
+	var url =  '__MODULE__/Public/upload_img';
 	var my_file = up + '_up';
 	var data = new Object();
 	data.my_file = my_file;

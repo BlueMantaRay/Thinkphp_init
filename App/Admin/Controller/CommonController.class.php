@@ -9,9 +9,9 @@ namespace Admin\Controller;
  * 等同于使用：class 类名 Common\Lib\AppController
  * (这里没有使用Thinkphp例子中写的Controller控制器，AppController是继承Controller的，这样你就可以在app中添加整个项目都会用到的方法了)
  */
-use Common\Lib\AppController;
-use Common\ORG\Menu;
-class CommonController extends AppController {
+use Common\Lib\BaseController;
+use Admin\Org\Menu;
+class CommonController extends BaseController {
 	protected $page_num = 10;
 
 	public function _initialize() {

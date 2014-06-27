@@ -66,7 +66,7 @@ function load_config($file,$parse=CONF_PARSE){
             return parse_ini_file($file);
         case 'yaml':
             return yaml_parse_file($file);
-        case 'xml':
+        case 'xml': 
             return (array)simplexml_load_file($file);
         case 'json':
             return json_decode(file_get_contents($file), true);
@@ -161,7 +161,7 @@ function L($name=null, $value=null) {
             foreach($replace as &$v){
                 $v = '{$'.$v.'}';
             }
-            return str_replace($replace,$value,isset($_lang[$name]) ? $_lang[$name] : $name);
+            return str_replace($replace,$value,isset($_lang[$name]) ? $_lang[$name] : $name);        
         }
         $_lang[$name] = $value; // 语言定义
         return;
@@ -226,10 +226,10 @@ function T($template='',$layer=''){
     $auto   =   C('AUTOLOAD_NAMESPACE');
     if($auto && isset($auto[$extend])){ // 扩展资源
         $baseUrl    =   $auto[$extend].$module.$layer.'/';
-    }elseif(C('VIEW_PATH')){
+    }elseif(C('VIEW_PATH')){ 
         // 改变模块视图目录
         $baseUrl    =   C('VIEW_PATH');
-    }elseif(defined('TMPL_PATH')){
+    }elseif(defined('TMPL_PATH')){ 
         // 指定全局视图目录
         $baseUrl    =   TMPL_PATH.$module;
     }else{
@@ -288,11 +288,11 @@ function I($name,$default='',$filter=null,$datas=null) {
                     $input  =  $_GET;
             }
             break;
-        case 'path'    :
+        case 'path'    :   
             $input  =   array();
             if(!empty($_SERVER['PATH_INFO'])){
                 $depr   =   C('URL_PATHINFO_DEPR');
-                $input  =   explode($depr,trim($_SERVER['PATH_INFO'],$depr));
+                $input  =   explode($depr,trim($_SERVER['PATH_INFO'],$depr));            
             }
             break;
         case 'request' :   $input =& $_REQUEST;   break;
@@ -326,7 +326,7 @@ function I($name,$default='',$filter=null,$datas=null) {
             }elseif(is_int($filters)){
                 $filters    =   array($filters);
             }
-
+            
             foreach($filters as $filter){
                 if(function_exists($filter)) {
                     $data   =   is_array($data)?array_map_recursive($filter,$data):$filter($data); // 参数过滤
@@ -629,7 +629,7 @@ function A($name,$layer='',$level='') {
     $level  =   $level? : ($layer == C('DEFAULT_C_LAYER')?C('CONTROLLER_LEVEL'):1);
     if(isset($_action[$name.$layer]))
         return $_action[$name.$layer];
-
+    
     $class  =   parse_res_name($name,$layer,$level);
     if(class_exists($class)) {
         $action             =   new $class();
@@ -675,7 +675,7 @@ function tag($tag, &$params=NULL) {
 /**
  * 执行某个行为
  * @param string $name 行为名称
- * @param string $tag 标签名称（行为类无需传入）
+ * @param string $tag 标签名称（行为类无需传入） 
  * @param Mixed $params 传入的参数
  * @return void
  */
@@ -817,7 +817,7 @@ function U($url='',$vars='',$suffix=true,$domain=false) {
         $anchor =   $info['fragment'];
         if(false !== strpos($anchor,'?')) { // 解析参数
             list($anchor,$info['query']) = explode('?',$anchor,2);
-        }
+        }        
         if(false !== strpos($anchor,'@')) { // 解析域名
             list($anchor,$host)    =   explode('@',$anchor, 2);
         }
@@ -853,7 +853,7 @@ function U($url='',$vars='',$suffix=true,$domain=false) {
         parse_str($info['query'],$params);
         $vars = array_merge($params,$vars);
     }
-
+    
     // URL组装
     $depr       =   C('URL_PATHINFO_DEPR');
     $urlCase    =   C('URL_CASE_INSENSITIVE');
@@ -894,7 +894,7 @@ function U($url='',$vars='',$suffix=true,$domain=false) {
                 $var[$varController]   =   parse_name($var[$varController]);
             }
             $module =   '';
-
+            
             if(!empty($path)) {
                 $var[$varModule]    =   implode($depr,$path);
             }else{
@@ -913,7 +913,7 @@ function U($url='',$vars='',$suffix=true,$domain=false) {
                 $module =   $var[$varModule];
                 unset($var[$varModule]);
             }
-
+            
         }
     }
 
@@ -921,7 +921,7 @@ function U($url='',$vars='',$suffix=true,$domain=false) {
         $url        =   __APP__.'?'.C('VAR_MODULE')."={$module}&".http_build_query(array_reverse($var));
         if($urlCase){
             $url    =   strtolower($url);
-        }
+        }        
         if(!empty($vars)) {
             $vars   =   http_build_query($vars);
             $url   .=   '&'.$vars;
@@ -939,7 +939,7 @@ function U($url='',$vars='',$suffix=true,$domain=false) {
         if(!empty($vars)) { // 添加参数
             foreach ($vars as $var => $val){
                 if('' !== trim($val))   $url .= $depr . $var . $depr . urlencode($val);
-            }
+            }                
         }
         if($suffix) {
             $suffix   =  $suffix===true?C('URL_HTML_SUFFIX'):$suffix;
@@ -1060,7 +1060,7 @@ function F($name, $value='', $path=DATA_PATH) {
         if (is_null($value)) {
             // 删除缓存
             if(false !== strpos($name,'*')){
-                return false; // TODO
+                return false; // TODO 
             }else{
                 unset($_cache[$name]);
                 return Think\Storage::unlink($filename,'F');
@@ -1180,16 +1180,16 @@ function session($name='',$value='') {
             $class  =   strpos($type,'\\')? $type : 'Think\\Session\\Driver\\'. ucwords(strtolower($type));
             $hander =   new $class();
             session_set_save_handler(
-                array(&$hander,"open"),
-                array(&$hander,"close"),
-                array(&$hander,"read"),
-                array(&$hander,"write"),
-                array(&$hander,"destroy"),
-                array(&$hander,"gc"));
+                array(&$hander,"open"), 
+                array(&$hander,"close"), 
+                array(&$hander,"read"), 
+                array(&$hander,"write"), 
+                array(&$hander,"destroy"), 
+                array(&$hander,"gc")); 
         }
         // 启动session
         if(C('SESSION_AUTO_START'))  session_start();
-    }elseif('' === $value){
+    }elseif('' === $value){ 
         if(''===$name){
             // 获取全部的session
             return $prefix ? $_SESSION[$prefix] : $_SESSION;
@@ -1222,17 +1222,17 @@ function session($name='',$value='') {
         }elseif($prefix){ // 获取session
             if(strpos($name,'.')){
                 list($name1,$name2) =   explode('.',$name);
-                return isset($_SESSION[$prefix][$name1][$name2])?$_SESSION[$prefix][$name1][$name2]:null;
+                return isset($_SESSION[$prefix][$name1][$name2])?$_SESSION[$prefix][$name1][$name2]:null;  
             }else{
-                return isset($_SESSION[$prefix][$name])?$_SESSION[$prefix][$name]:null;
-            }
+                return isset($_SESSION[$prefix][$name])?$_SESSION[$prefix][$name]:null;                
+            }            
         }else{
             if(strpos($name,'.')){
                 list($name1,$name2) =   explode('.',$name);
-                return isset($_SESSION[$name1][$name2])?$_SESSION[$name1][$name2]:null;
+                return isset($_SESSION[$name1][$name2])?$_SESSION[$name1][$name2]:null;  
             }else{
                 return isset($_SESSION[$name])?$_SESSION[$name]:null;
-            }
+            }            
         }
     }elseif(is_null($value)){ // 删除session
         if($prefix){
@@ -1355,7 +1355,7 @@ function load_ext_file($path) {
 /**
  * 获取客户端IP地址
  * @param integer $type 返回类型 0 返回IP地址 1 返回IPV4地址数字
- * @param boolean $adv 是否进行高级模式获取（有可能被伪装）
+ * @param boolean $adv 是否进行高级模式获取（有可能被伪装） 
  * @return mixed
  */
 function get_client_ip($type = 0,$adv=false) {

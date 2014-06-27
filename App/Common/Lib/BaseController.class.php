@@ -2,7 +2,7 @@
 namespace Common\Lib;
 
 use Think\Controller;
-class AppController extends Controller {
+class BaseController extends Controller {
 
 	/**
 	 +----------------------------------------------------------
@@ -28,9 +28,11 @@ class AppController extends Controller {
 		$msg = $data;
 		if ($info == 'ok' || $info == 'success' || $info == 'succ') {
 			$this->success($msg, $jumpUrl);
+			exit;
 		}
 		if ($info == 'error' || $info == 'fail') {
 			$this->error($msg, $jumpUrl);
+			exit;
 		}
 	}
 

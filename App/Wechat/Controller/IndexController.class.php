@@ -1,7 +1,7 @@
 <?php
 namespace Wechat\Controller;
-use Common\Lib\CommonController;
-class IndexController extends CommonController {
+use Common\Lib\BaseController;
+class IndexController extends BaseController {
     public function index(){
 		echo 'wechat';
 

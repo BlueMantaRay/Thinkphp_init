@@ -9,8 +9,8 @@ namespace Admin\Controller;
  * 等同于使用：class 类名 Common\Lib\AppController
  * (这里没有使用Thinkphp例子中写的Controller控制器，AppController是继承Controller的，这样你就可以在app中添加整个项目都会用到的方法了)
  */
-use Common\Lib\AppController;
-class ResourceController extends AppController {
+use Admin\Controller\CommonController;
+class ResourceController extends CommonController {
 
 	public function photo_del(){
 		$id = I('p_id', 0);
@@ -40,66 +40,7 @@ class ResourceController extends AppController {
 	}
 
 
-	/**
-	 * 图片上传
-	 */
-	public function upload_img(){
-		$config['exts'] = array('jpg', 'gif', 'png', 'jpeg');
 
-		$this->_upload_one($_FILES['image_up'] ,$config);
-
-	}
-
-	/**
-	 * 上传
-	 */
-	public function _upload_one($files, $config = array()){
-		$default_config = array(
-				'maxSize'    =>    3145728,
-				'rootPath'	 =>    './Public/',
-				'savePath'   =>    './upload/',
-				'saveName'   =>    array('uniqid',''),
-				'autoSub'    =>    true,
-				'subName'    =>    array('date','Ymd')
-		);
-		// 如果传入配置会覆盖上面的
-		if ($config && is_array($config)) {
-			$config = array_merge($config, $default_config);
-		} else {
-			$config = $default_config;
-		}
-
-		$upload = new \Think\Upload($config);
-
-		// 上传文件
-		$info   =   $upload->uploadOne($files);
-
-		if(!$info) {
-			// 上传错误提示错误信息
-			$this->out('error', $upload->getError());
-		}
-
-		$model = D("resource"); // 实例化对象,实例化的是App/Common/Model下的model
-		unset($info['key']);
-		unset($info['md5']);
-		unset($info['sha1']);
-		$info['add_time'] = time();
-		$id = $model->data($info)->add();
-		$info['id'] = $id;
-		$info['path'] = __ROOT__.'/Public'.ltrim($info['savepath'], '.').$info['savename'];
-		// 上传缩放
-		$type = I('type', 'thumb');
-		$width = I('width', 100);
-		$height = I('height', 100);
-		$thumb_img = '';
-		if ($type) {
-			$thumb_img = get_img($id, $width, $height, $type);
-		}
-		$info['thumb_img'] = $thumb_img;
-		// 上传成功
-		$this->out('ok', $info);
-
-	}
 
 
 

@@ -25,7 +25,7 @@ class MenuController extends CommonController {
 
     	$model = D('Menu');
     	$count = $model->where ($where)->count (); // 查询满足要求的总记录数
-    	$page = new \Think\Page ($count, $this->page_num); // 实例化分页类 传入总记录数和每页显示的记录数
+    	$page = new \Admin\Org\Page ($count, $this->page_num); // 实例化分页类 传入总记录数和每页显示的记录数
     	// 进行分页数据查询 注意limit方法的参数要使用Page类的属性
     	$order = 'id asc';
     	$field = array('id','title','module_name','controller_name','action_name','icon','param','pid','path','level','is_show','view_order','status',"concat(path,'-',id) as bpath");
@@ -245,7 +245,7 @@ class MenuController extends CommonController {
     	}
     	$model = D('Role');
     	$count = $model->where ($where)->count (); // 查询满足要求的总记录数
-    	$page = new \Think\Page ($count, $this->page_num); // 实例化分页类 传入总记录数和每页显示的记录数
+    	$page = new \Admin\Org\Page ($count, $this->page_num); // 实例化分页类 传入总记录数和每页显示的记录数
     	// 进行分页数据查询 注意limit方法的参数要使用Page类的属性
     	$order = 'id asc';
     	$list = $model->where($where)->order($order)->limit($page->firstRow.','.$page->listRows)->select();
