@@ -12,32 +12,6 @@ namespace Admin\Controller;
 use Admin\Controller\CommonController;
 class ResourceController extends CommonController {
 
-	public function photo_del(){
-		$id = I('p_id', 0);
-		if (empty ( $id )) {
-			$this->out('ok', '删除成功');
-		}
-		$model = D("resource"); // 实例化对象,实例化的是App/Common/Model下的model
-		$info = $model->find($id);
-		if (empty($info)) {
-			$this->out('ok', '删除成功');
-		}
-		$img_path = 'Public'.ltrim($info['savepath'], '.').$info['savename'];
-		$dirname = dirname($img_path);
-		$filename = array_shift(explode('.', $info['savename']));
-		$search = $dirname.'/'.$filename.'_*.'.$info['ext'];
-		$arr = glob($search);
-		if ($arr) {
-			foreach ($arr as $v) {
-				$result = unlink($v);
-			}
-		}
-
-		if (file_exists($img_path)) {
-			$result = unlink($img_path);
-		}
-		$this->out('ok', '删除成功');
-	}
 
 
 
